@@ -11,11 +11,10 @@ SMTP_HOST=''
 SMTP_PORT=''
 SMTP_SSL=False
 
-
 SMTP_FROM_EMAIL=''
 SMTP_TO_EMAIL=''
 
-def email_notification(message):
+def email_notification(subject, message):
     """Send an email notification.
 
     message - The message to send as the body of the email.
@@ -28,14 +27,13 @@ def email_notification(message):
     smtp_server.ehlo()
     smtp_server.login(SMTP_USER, SMTP_PASSWORD)
 
-    email_text = """\
-        FROM: %s
-        TO: %s
-        Subject: A Change Has Occurred
-        
+    email_text = \
+"""From: %s
+To: %s
+Subject: %s 
 
-        %s
-        """ % (SMTP_FROM_EMAIL, SMTP_TO_EMAIL, message)
+%s
+""" % (SMTP_FROM_EMAIL, SMTP_TO_EMAIL, subject, message)
 
     smtp_server.sendmail(SMTP_FROM_EMAIL, SMTP_TO_EMAIL, email_text)
 
@@ -105,12 +103,12 @@ def main():
     website_status = has_website_changed(sys.argv[1], sys.argv[2])
 
     if website_status == -1:
-        email_notification("Error While Fetching " + sys.argv[1])
+        email_notification("An Error has Occurred", "Error While Fetching " + sys.argv[1])
         print("Non 2XX response while fetching")
     elif website_status == 0:
         print("Website is the same")
     elif website_status == 1:
-        email_notification(sys.argv[1] + " has changed.")
+        email_notification("A Change has Occurred", sys.argv[1] + " has changed.")
         print("Website has changed")
         
 if __name__ == "__main__":
